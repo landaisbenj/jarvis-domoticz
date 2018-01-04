@@ -15,10 +15,16 @@ fi
 
 #Fonction pour commander un volet
 pg_dz_blind () {
-local api="http://${pg_dz_domoticz_ip}:${pg_dz_domoticz_port}/json.htm?type=command&param=switchlight&switchcmd=${1}"
+local cmd=${1}
 pg_dz_idx $2
 local idx=$?
 if [ $idx != 0 ]; then
+pg_dz_is_blind_inverted $idx
+local ivt=$?
+if [ $ivt == 1 ]; then
+[ "$cmd" == "On" ] && cmd="Off" || cmd="On"
+fi
+local api="http://${pg_dz_domoticz_ip}:${pg_dz_domoticz_port}/json.htm?type=command&param=switchlight&switchcmd=${cmd}"
 jv_curl "${api}&idx=${idx}"
 say "$(pg_dz_lg "blind_$1" "$device")"
 else
@@ -66,4 +72,10 @@ local -r order="$(jv_sanitize "$order")"
     say "$(pg_dz_lg "no_device_matching")"
     return 0
 
+}
+
+# Fonction volet inserse ?
+pg_dz_is_blind_inverted() {
+local api="$(curl -s "http://${pg_dz_domoticz_ip}:${pg_dz_domoticz_port}/json.htm?type=devices&rid=${1}" | jq -r '.result[].SwitchTypeVal')"
+[ $api == 16 ] && return 1 || return 0
 }

@@ -28,11 +28,11 @@ Jarvis: J'ai fermé les volets
 ```
 ```
 You: Jarvis, quel est l'etat du volet?
-Jarvis: Je regarde... Volet: close
+Jarvis: Je regarde... Volet: Ouvert
 ```
 ```
 You: Jarvis, donne moi la temperature du salon
-Jarvis: La termperature du salon: 21.2 degrés
+Jarvis: La termperature salon: 21.2 degrés
 ```
 
 ## Author

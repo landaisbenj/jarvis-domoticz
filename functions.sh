@@ -2,7 +2,7 @@
 
 #Fonction pour commander un switch
 pg_dz_switch () {
-local api="http://${pg_dz_domoticz_ip}:${pg_dz_domoticz_port}/json.htm?type=command&param=switchlight&switchcmd=${1}"
+local api="${pg_dz_domoticz_secure}://${pg_dz_domoticz_ip}:${pg_dz_domoticz_port}/json.htm?type=command&param=switchlight&switchcmd=${1}"
 pg_dz_idx $2
 local idx=$?
 if [ $idx != 0 ]; then
@@ -24,7 +24,7 @@ local ivt=$?
 if [ $ivt == 1 ]; then
 [ "$cmd" == "On" ] && cmd="Off" || cmd="On"
 fi
-local api="http://${pg_dz_domoticz_ip}:${pg_dz_domoticz_port}/json.htm?type=command&param=switchlight&switchcmd=${cmd}"
+local api="${pg_dz_domoticz_secure}://${pg_dz_domoticz_ip}:${pg_dz_domoticz_port}/json.htm?type=command&param=switchlight&switchcmd=${cmd}"
 jv_curl "${api}&idx=${idx}"
 say "$(pg_dz_lg "blind_$1" "$device")"
 else
@@ -34,7 +34,7 @@ fi
 
 #Fonction pour demander l'etat d'un device
 pg_dz_stat () {
-local api="http://${pg_dz_domoticz_ip}:${pg_dz_domoticz_port}/json.htm?type=devices"
+local api="${pg_dz_domoticz_secure}://${pg_dz_domoticz_ip}:${pg_dz_domoticz_port}/json.htm?type=devices"
 pg_dz_idx $1
 local idx=$?
 if [ $idx != 0 ]; then
@@ -47,7 +47,7 @@ fi
 
 #Fonction pour demander une temperature
 pg_dz_temp () {
-local api="http://${pg_dz_domoticz_ip}:${pg_dz_domoticz_port}/json.htm?type=devices"
+local api="${pg_dz_domoticz_secure}://${pg_dz_domoticz_ip}:${pg_dz_domoticz_port}/json.htm?type=devices"
 pg_dz_idx $1
 local idx=$?
 if [ $idx != 0 ]; then
@@ -60,7 +60,7 @@ fi
 
 #Fonction de recuperation de l'idx, via les devices en favoris
 pg_dz_idx () {
-local pg_dz_device="$(curl -s "http://${pg_dz_domoticz_ip}:${pg_dz_domoticz_port}/json.htm?type=devices&used=true&filter=all&favorite=1")"
+local pg_dz_device="$(curl -s "${pg_dz_domoticz_secure}://${pg_dz_domoticz_ip}:${pg_dz_domoticz_port}/json.htm?type=devices&used=true&filter=all&favorite=1")"
 local -r order="$(jv_sanitize "$order")"
     while read device; do
         local sdevice="$(jv_sanitize "$device" ".*")"
@@ -76,6 +76,6 @@ local -r order="$(jv_sanitize "$order")"
 
 # Fonction volet inserse ?
 pg_dz_is_blind_inverted() {
-local api="$(curl -s "http://${pg_dz_domoticz_ip}:${pg_dz_domoticz_port}/json.htm?type=devices&rid=${1}" | jq -r '.result[].SwitchTypeVal')"
+local api="$(curl -s "${pg_dz_domoticz_secure}://${pg_dz_domoticz_ip}:${pg_dz_domoticz_port}/json.htm?type=devices&rid=${1}" | jq -r '.result[].SwitchTypeVal')"
 [ $api == 16 ] && return 1 || return 0
 }

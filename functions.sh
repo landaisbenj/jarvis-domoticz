@@ -3,10 +3,14 @@
 #Fonction pour commander un switch
 pg_dz_switch () {
 local api="${pg_dz_domoticz_secure}://${pg_dz_domoticz_ip}:${pg_dz_domoticz_port}/json.htm?type=command&param=switchlight&switchcmd=${1}"
+local api_group="${pg_dz_domoticz_secure}://${pg_dz_domoticz_ip}:${pg_dz_domoticz_port}/json.htm?type=command&param=switchscene&switchcmd=${1}"
 pg_dz_idx $2
 local idx=$?
-if [ $idx != 0 ]; then
+if [ $idx != 0 -a $type != "Scene" -a $type != "Group" ]; then
 jv_curl "${api}&idx=${idx}"
+say "$(pg_dz_lg "switch_$1" "$device")"
+elif [ $idx != 0 -a $type == "Scene" -o $type == "Group" ]; then
+jv_curl "${api_group}&idx=${idx}"
 say "$(pg_dz_lg "switch_$1" "$device")"
 else
 return 0
@@ -66,6 +70,7 @@ local -r order="$(jv_sanitize "$order")"
         local sdevice="$(jv_sanitize "$device" ".*")"
 		if [[ "$order" =~ .*$sdevice.* ]]; then
             local idx="$(echo $pg_dz_device | jq -r ".result[] | select(.Name==\"$device\") | .idx")"
+	    type="$(echo $pg_dz_device | jq -r ".result[] | select(.Name==\"$device\") | .Type")"
 			return $idx
         fi
     done <<< "$(echo $pg_dz_device | jq -r '.result[].Name')"

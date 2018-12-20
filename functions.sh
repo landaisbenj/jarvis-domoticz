@@ -6,12 +6,14 @@ local api="${pg_dz_domoticz_secure}://${pg_dz_domoticz_ip}:${pg_dz_domoticz_port
 local api_group="${pg_dz_domoticz_secure}://${pg_dz_domoticz_ip}:${pg_dz_domoticz_port}/json.htm?type=command&param=switchscene&switchcmd=${1}"
 pg_dz_idx $2
 local idx=$?
-if [ $idx != 0 -a $type != "Scene" -a $type != "Group" ]; then
-jv_curl "${api}&idx=${idx}"
-say "$(pg_dz_lg "switch_$1" "$device")"
-elif [ $idx != 0 -a $type == "Scene" -o $type == "Group" ]; then
-jv_curl "${api_group}&idx=${idx}"
-say "$(pg_dz_lg "switch_$1" "$device")"
+if [ $idx != 0 ]; then
+	if [ "$type" == "Scene" ] || [ "$type" == "Group" ]; then
+	jv_curl "${api_group}&idx=${idx}"
+	say "$(pg_dz_lg "switch_$1" "$device")"
+	else
+	jv_curl "${api}&idx=${idx}"
+	say "$(pg_dz_lg "switch_$1" "$device")"
+	fi
 else
 return 0
 fi
